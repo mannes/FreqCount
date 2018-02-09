@@ -60,6 +60,11 @@
   #define COUNTER_USE_TIMER1    // T1 is pin 5
   #define TIMER_USE_TIMER2
 
+// ESP8266
+#elif defined(ARDUINO_ESP8266_ESP01)
+  #define COUNTER_USE_OSTIMER    // T1 is pin 5
+  #define TIMER_USE_OSTIMER
+
 #else
   #error "Unknown chip, please edit me with timer+counter definitions"
 
