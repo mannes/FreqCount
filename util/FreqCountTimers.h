@@ -288,6 +288,41 @@ static inline void counter_overflow_reset(void)
 	TIFR5 = (1<<TOV5);
 }
 
+#elif defined(COUNTER_USE_OSTIMER) // os timer on ESP8266
+
+static os_timer_t counterTimer;
+volatile uint_8 count = 0;
+
+static inline void counter_init(void)
+{
+	os_timer_setfn(&counterTimer, counterCallback, NULL);
+}
+
+static inline void counter_start(void)
+{
+	os_timer_arm(&counterTimer, 1, true);
+}
+
+static inline void counter_shutdown(void)
+{
+	os_timer_disarm(&counterTimer);
+}
+
+static inline uint16_t counter_read(void)
+{
+	return count;
+}
+
+static inline uint8_t counter_overflow(void)
+{
+	// eh? return TIFR5 & (1<<TOV5);
+}
+
+static inline void counter_overflow_reset(void)
+{
+	// figure this out TIFR5 = (1<<TOV5);
+}
+
 
 #endif // COUNTER_USE_***
 
@@ -327,8 +362,26 @@ static inline void timer_shutdown(void)
 #endif
 #define ISR(name) void name (void)
 
+#if defined(TIMER_USE_OSTIMER) // Teensyduino IntervalTimer
 
+static os_timer_t itimer;
+static void timer_interrupt(void);
 
+static inline uint16_t timer_init(uint16_t msec)
+{
+	os_timer_setfn(&counterTimer, timer_interrupt, NULL);
+	return msec;
+}
+
+static inline void timer_start(void)
+{
+	os_timer_arm(&itimer, 1, true);
+}
+
+static inline void timer_shutdown(void)
+{
+	os_timer_disarm(&itimer);
+}
 
 #elif defined(TIMER_USE_TIMER2) // 8 bit Timer 2 on Atmel AVR
 
